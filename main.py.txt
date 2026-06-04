@@ -1,0 +1,17 @@
+import telebot
+
+TOKEN = "8923305310:AAG1fS-vOvHjw2xHIelTrTz-zs_ BZHGJZIY"
+
+bot = telebot.TeleBot(TOKEN)
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.reply_to(message, "موفق شدی 👋 ربات روشنه!")
+
+@bot.message_handler(func=lambda message: True)
+def echo(message):
+    bot.reply_to(message, f"گفتی: {message.text}")
+
+print("Bot Started...")
+
+bot.infinity_polling()
