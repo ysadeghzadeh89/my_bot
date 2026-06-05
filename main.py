@@ -35,11 +35,11 @@ def start(message):
         "تورنتو": "America/Toronto",
     }
 
-    text = "🌍 ساعت پایتخت‌ها:\n\n"
+    text = "🌍⌚️ ساعت پایتخت‌های مهم:\n\n"
 
     for city, tz in capitals.items():
         now = datetime.now(ZoneInfo(tz))
-        text += f"{city}: {now.strftime('%H:%M:%S')}\n"
+        text += f"{city}⌚️: {now.strftime('%H:%M:%S')}\n"
 
     bot.send_message(message.chat.id, text)
 
