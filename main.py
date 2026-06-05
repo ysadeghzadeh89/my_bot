@@ -1,17 +1,17 @@
+import os
 import telebot
 
-TOKEN = "8923305310:AAG1fS-vOvHjw2xHIelTrTz-zs_ BZHGJZIY"
+TOKEN = os.getenv("BOT_TOKEN")
 
 bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "موفق شدی 👋 ربات روشنه!")
+    bot.reply_to(message, "ربات روشنه 👋")
 
 @bot.message_handler(func=lambda message: True)
 def echo(message):
-    bot.reply_to(message, f"گفتی: {message.text}")
+    bot.reply_to(message, message.text)
 
 print("Bot Started...")
-
 bot.infinity_polling()
