@@ -1,8 +1,9 @@
+import os
 import telebot
 import requests
 from bs4 import BeautifulSoup
 
-TOKEN = "8923305310:AAG1fS-vOvHjw2xHIelTrTz-zs_BZHGJziY"
+TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 def get_usd():
