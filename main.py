@@ -1,45 +1,33 @@
 import os
 import telebot
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = 927058267
 
 bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    user = message.from_user
+
+    username = f"@{user.username}" if user.username else "ندارد"
+    last_name = user.last_name if user.last_name else "ندارد"
+
+    info = f"""
+🚨 کاربر جدید وارد شد
+
+👤 نام: {user.first_name}
+📛 نام خانوادگی: {last_name}
+🔗 یوزرنیم: {username}
+🆔 آیدی: {user.id}
+"""
+
+    bot.send_message(ADMIN_ID, info)
+
     bot.reply_to(
         message,
-        "🌍 نام شهر را بفرست\n\nمثال:\nLondon\nTokyo\nTehran\nNew York"
+        "سلام 👋\nبه ربات خوش اومدی."
     )
 
-@bot.message_handler(func=lambda m: True)
-def get_time(message):
-    cities = {
-        "tehran": "Asia/Tehran",
-        "london": "Europe/London",
-        "paris": "Europe/Paris",
-        "berlin": "Europe/Berlin",
-        "moscow": "Europe/Moscow",
-        "dubai": "Asia/Dubai",
-        "tokyo": "Asia/Tokyo",
-        "beijing": "Asia/Shanghai",
-        "new york": "America/New_York",
-        "los angeles": "America/Los_Angeles",
-        "toronto": "America/Toronto",
-        "sydney": "Australia/Sydney",
-    }
-
-    city = message.text.lower()
-
-    if city in cities:
-        now = datetime.now(ZoneInfo(cities[city]))
-        bot.reply_to(
-            message,
-            f"🕒 ساعت {message.text.title()}\n\n{now.strftime('%Y-%m-%d %H:%M:%S')}"
-        )
-    else:
-        bot.reply_to(message, "❌ شهر پیدا نشد")
-
+print("Bot is running...")
 bot.infinity_polling(skip_pending=True)
