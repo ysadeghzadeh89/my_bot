@@ -1,65 +1,45 @@
 import os
 import telebot
-import requests
-from bs4 import BeautifulSoup
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 TOKEN = os.getenv("BOT_TOKEN")
+
 bot = telebot.TeleBot(TOKEN)
-
-def get_usd():
-    try:
-        url = "https://api.exchangerate.host/latest?base=USD&symbols=IRR"
-        data = requests.get(url, timeout=10).json()
-        return int(data["rates"]["IRR"])
-    except:
-        return None
-
-
-def get_gold():
-    try:
-        url = "https://www.tgju.org/profile/geram18"
-        headers = {"User-Agent": "Mozilla/5.0"}
-        r = requests.get(url, headers=headers, timeout=10)
-
-        soup = BeautifulSoup(r.text, "html.parser")
-
-        price = soup.find("span", {"data-col": "info.last_trade.PDrCotVal"})
-        if price:
-            return price.text.strip()
-        return "نامشخص"
-    except:
-        return "خطا در دریافت"
-
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id,
-        "👋 سلام\n\n/price\n/dollar\n/gold"
+    bot.reply_to(
+        message,
+        "🌍 نام شهر را بفرست\n\nمثال:\nLondon\nTokyo\nTehran\nNew York"
     )
 
+@bot.message_handler(func=lambda m: True)
+def get_time(message):
+    cities = {
+        "tehran": "Asia/Tehran",
+        "london": "Europe/London",
+        "paris": "Europe/Paris",
+        "berlin": "Europe/Berlin",
+        "moscow": "Europe/Moscow",
+        "dubai": "Asia/Dubai",
+        "tokyo": "Asia/Tokyo",
+        "beijing": "Asia/Shanghai",
+        "new york": "America/New_York",
+        "los angeles": "America/Los_Angeles",
+        "toronto": "America/Toronto",
+        "sydney": "Australia/Sydney",
+    }
 
-@bot.message_handler(commands=['price'])
-def price(message):
-    usd = get_usd()
-    gold = get_gold()
+    city = message.text.lower()
 
-    text = "📊 قیمت لحظه‌ای:\n\n"
-
-    text += f"💵 دلار: {usd:,} ریال\n" if usd else "💵 دلار: خطا\n"
-    text += f"🪙 طلا 18: {gold} تومان\n"
-
-    bot.send_message(message.chat.id, text)
-
-
-@bot.message_handler(commands=['dollar'])
-def dollar(message):
-    usd = get_usd()
-    bot.send_message(message.chat.id, f"💵 {usd:,}" if usd else "خطا")
-
-
-@bot.message_handler(commands=['gold'])
-def gold(message):
-    bot.send_message(message.chat.id, f"🪙 {get_gold()}")
-
+    if city in cities:
+        now = datetime.now(ZoneInfo(cities[city]))
+        bot.reply_to(
+            message,
+            f"🕒 ساعت {message.text.title()}\n\n{now.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+    else:
+        bot.reply_to(message, "❌ شهر پیدا نشد")
 
 bot.infinity_polling(skip_pending=True)
