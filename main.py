@@ -15,9 +15,10 @@ def start(message):
     bot.send_message(
         ADMIN_ID,
         f"""
-🚨 کاربر جدید
+🚨  کاربر جدید وارد شد
 
 👤 نام: {user.first_name}
+👪 نام خانوادگی: {user.last_name}
 🆔 آیدی: {user.id}
 🔗 یوزرنیم: @{user.username}
 """
