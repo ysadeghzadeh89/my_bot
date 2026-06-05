@@ -1,17 +1,45 @@
-import os
 import telebot
+import requests
 
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = "توکن_رباتت_اینجا"
 
 bot = telebot.TeleBot(TOKEN)
 
+def get_usd():
+    try:
+        url = "https://api.exchangerate.host/latest?base=USD&symbols=IRR"
+        data = requests.get(url).json()
+        return int(data["rates"]["IRR"])
+    except:
+        return None
+
+def get_gold():
+    return "18,250,000"
+
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "ربات روشنه 👋")
+    bot.send_message(message.chat.id,
+        "👋 سلام!\n\n/price\n/dollar\n/gold"
+    )
 
-@bot.message_handler(func=lambda message: True)
-def echo(message):
-    bot.reply_to(message, message.text)
+@bot.message_handler(commands=['price'])
+def price(message):
+    usd = get_usd()
+    text = "📊\n\n"
+    if usd:
+        text += f"💵 دلار: {usd:,} ریال\n"
+    else:
+        text += "💵 دلار: خطا\n"
+    text += f"🪙 طلا: {get_gold()} تومان"
+    bot.send_message(message.chat.id, text)
 
-print("Bot Started...")
+@bot.message_handler(commands=['dollar'])
+def dollar(message):
+    usd = get_usd()
+    bot.send_message(message.chat.id, f"💵 {usd:,}" if usd else "خطا")
+
+@bot.message_handler(commands=['gold'])
+def gold(message):
+    bot.send_message(message.chat.id, f"🪙 {get_gold()}")
+
 bot.infinity_polling()
