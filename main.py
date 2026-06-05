@@ -12,35 +12,30 @@ bot = telebot.TeleBot(TOKEN)
 def start(message):
     user = message.from_user
 
-    username = f"@{user.username}" if user.username else "ندارد"
-    last_name = user.last_name if user.last_name else "ندارد"
-
-    info = f"""
+    bot.send_message(
+        ADMIN_ID,
+        f"""
 🚨 کاربر جدید
 
 👤 نام: {user.first_name}
-📛 نام خانوادگی: {last_name}
-🔗 یوزرنیم: {username}
 🆔 آیدی: {user.id}
+🔗 یوزرنیم: @{user.username}
 """
-
-    bot.send_message(ADMIN_ID, info)
+    )
 
     capitals = {
-        "🇮🇷 تهران": "Asia/Tehran",
-        "🇬🇧 لندن": "Europe/London",
-        "🇫🇷 پاریس": "Europe/Paris",
-        "🇩🇪 برلین": "Europe/Berlin",
-        "🇷🇺 مسکو": "Europe/Moscow",
-        "🇦🇪 ابوظبی": "Asia/Dubai",
-        "🇨🇳 پکن": "Asia/Shanghai",
-        "🇯🇵 توکیو": "Asia/Tokyo",
-        "🇺🇸 واشنگتن": "America/New_York",
-        "🇨🇦 اتاوا": "America/Toronto",
-        "🇦🇺 کانبرا": "Australia/Sydney",
+        "تهران": "Asia/Tehran",
+        "لندن": "Europe/London",
+        "پاریس": "Europe/Paris",
+        "برلین": "Europe/Berlin",
+        "مسکو": "Europe/Moscow",
+        "دبی": "Asia/Dubai",
+        "توکیو": "Asia/Tokyo",
+        "نیویورک": "America/New_York",
+        "تورنتو": "America/Toronto",
     }
 
-    text = "🌍 ساعت پایتخت‌های جهان\n\n"
+    text = "🌍 ساعت پایتخت‌ها:\n\n"
 
     for city, tz in capitals.items():
         now = datetime.now(ZoneInfo(tz))
