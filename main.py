@@ -208,5 +208,23 @@ def top(message):
 
     bot.send_message(message.chat.id, text)
 
+ADMIN_ID = 927058267
 
+@bot.message_handler(func=lambda m: m.text == "پول مخفی")
+def secret_money(message):
+
+    if message.from_user.id != ADMIN_ID:
+        return
+
+    cursor.execute(
+        "UPDATE users SET balance = balance + 50000 WHERE user_id = ?",
+        (message.from_user.id,)
+    )
+
+    db.commit()
+
+    bot.reply_to(
+        message,
+        "💰 50000 سکه به حسابت اضافه شد!"
+    )
 bot.infinity_polling(skip_pending=True)
