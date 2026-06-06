@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS users(
     user_id INTEGER PRIMARY KEY,
     name TEXT,
     balance INTEGER DEFAULT 1000,
-    last_daily TEXT
+    last_daily TEXT DEFAULT '',
+    luck INTEGER DEFAULT 0
 )
 """)
 db.commit()
@@ -90,7 +91,12 @@ def daily(message):
         message,
         f"🎁 جایزه روزانه: {reward} سکه"
     )
+cursor.execute(
+    "SELECT balance,luck FROM users WHERE user_id=?",
+    (message.from_user.id,)
+)
 
+balance, user_luck = cursor.fetchone()
 @bot.message_handler(commands=["bet"])
 def bet(message):
     try:
@@ -108,7 +114,9 @@ def bet(message):
         bot.reply_to(message, "❌ موجودی کافی نیست")
         return
 
-    if random.randint(1, 100) <= 50:
+    chance = min(85, 50 + user_luck)
+
+if random.randint(1, 100) <= chance:
 
         cursor.execute(
             "UPDATE users SET balance=balance+? WHERE user_id=?",
@@ -170,4 +178,49 @@ def secret_money(message):
         message,
         "💰 50000 سکه به حسابت اضافه شد!"
     )
+    @bot.message_handler(commands=["luck"])
+def luck(message):
+
+    cursor.execute(
+        "SELECT luck FROM users WHERE user_id=?",
+        (message.from_user.id,)
+    )
+
+    l = cursor.fetchone()[0]
+
+    bot.reply_to(message, f"🍀 شانس: {l}%")
+    @bot.message_handler(commands=["buy"])
+def buy(message):
+
+    items = {
+        "clover": (5000, 5),
+        "hat": (15000, 10),
+        "diamond": (50000, 20),
+        "crown": (200000, 30)
+    }
+
+    try:
+        item = message.text.split()[1].lower()
+    except:
+        bot.reply_to(message, "/buy clover\n/buy hat\n/buy diamond\n/buy crown")
+        return
+
+    if item not in items:
+        bot.reply_to(message, "❌ آیتم نیست")
+        return
+
+    price, bonus = items[item]
+    user = get_user(message.from_user)
+
+    if user[2] < price:
+        bot.reply_to(message, "❌ پول نداری")
+        return
+
+    cursor.execute(
+        "UPDATE users SET balance=balance-?, luck=luck+? WHERE user_id=?",
+        (price, bonus, message.from_user.id)
+    )
+    db.commit()
+
+    bot.reply_to(message, f"✅ خرید شد +{bonus}% شانس")
 bot.infinity_polling(skip_pending=True)
