@@ -333,18 +333,6 @@ def accept(message):
 
     active_bet = None
     
-
-    cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
-    user = cursor.fetchone()
-
-    if user is None:
-        cursor.execute(
-            "INSERT INTO users (user_id, name, balance, luck) VALUES (?, ?, ?, ?)",
-            (user_id, name, 1000, 10)
-        )
-        conn.commit()
-
-    bot.send_message(message.chat.id, "خوش اومدی 👋")
 @bot.message_handler(commands=["balances"])
 def balances(message):
 
