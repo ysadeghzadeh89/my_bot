@@ -332,17 +332,14 @@ def accept(message):
     )
 
     active_bet = None
-@bot.message_handler(commands=["start"])
-def start(message):
-    user_id = message.from_user.id
-    name = message.from_user.first_name
+    
 
-    cursor.execute("SELECT * FROM users WHERE id=?", (user_id,))
+    cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
     user = cursor.fetchone()
 
     if user is None:
         cursor.execute(
-            "INSERT INTO users (id, name, balance, luck) VALUES (?, ?, ?, ?)",
+            "INSERT INTO users (user_id, name, balance, luck) VALUES (?, ?, ?, ?)",
             (user_id, name, 1000, 10)
         )
         conn.commit()
@@ -383,15 +380,15 @@ def pay(message):
         bot.reply_to(message, "نمی‌تونی به خودت پول بدی.")
         return
 
-    cursor.execute("SELECT balance FROM users WHERE id=?", (sender_id,))
+    cursor.execute("SELECT balance FROM users WHERE user_id=?", (sender_id,))
     sender = cursor.fetchone()
 
     if not sender or sender[0] < amount:
         bot.reply_to(message, "موجودی کافی نداری.")
         return
 
-    cursor.execute("UPDATE users SET balance = balance - ? WHERE id=?", (amount, sender_id))
-    cursor.execute("UPDATE users SET balance = balance + ? WHERE id=?", (amount, receiver_id))
+    cursor.execute("UPDATE users SET balance = balance - ? WHERE user_id=?", (amount, sender_id))
+    cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id=?", (amount, receiver_id))
     conn.commit()
 
     bot.reply_to(message, f"✅ {amount:,} سکه منتقل شد.")
