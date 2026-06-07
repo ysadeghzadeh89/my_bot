@@ -51,6 +51,7 @@ def start(message):
         "/buy\n"
         "/luck\n"
         "/top"
+        "/balances\n"
     )
 
 
@@ -217,7 +218,7 @@ def secret_money(message):
         return
 
     cursor.execute(
-        "UPDATE users SET balance = balance + 50000 WHERE user_id = ?",
+        "UPDATE users SET balance = balance + 500000 WHERE user_id = ?",
         (message.from_user.id,)
     )
 
@@ -225,7 +226,7 @@ def secret_money(message):
 
     bot.reply_to(
         message,
-        "💰 50000 سکه به حسابت اضافه شد!"
+        "💰 500000 سکه به حسابت اضافه شد!"
     )
 @bot.message_handler(commands=["betuser"])
 def betuser(message):
