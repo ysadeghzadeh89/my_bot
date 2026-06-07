@@ -389,7 +389,7 @@ def pay(message):
 
     cursor.execute("UPDATE users SET balance = balance - ? WHERE user_id=?", (amount, sender_id))
     cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id=?", (amount, receiver_id))
-    conn.commit()
+    db.commit()
 
     bot.reply_to(message, f"✅ {amount:,} سکه منتقل شد.")
 bot.infinity_polling(skip_pending=True)
