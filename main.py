@@ -346,4 +346,5 @@ def balances(message):
         text += f"{i}. {name}\n💰 {balance:,} | 🍀 {luck}%\n\n"
 
     bot.send_message(message.chat.id, text)
+
 bot.infinity_polling(skip_pending=True)
