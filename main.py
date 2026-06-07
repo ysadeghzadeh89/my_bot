@@ -364,7 +364,7 @@ def balances(message):
         text += f"{i}. {name}\n💰 {balance:,} | 🍀 {luck}%\n\n"
 
     bot.send_message(message.chat.id, text)
-    @bot.message_handler(commands=["pay"])
+@bot.message_handler(commands=["pay"])
 def pay(message):
     if not message.reply_to_message:
         bot.reply_to(message, "روی پیام فرد مورد نظر ریپلای کن.")
