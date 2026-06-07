@@ -3,7 +3,7 @@ import telebot
 import sqlite3
 import random
 from datetime import datetime
-
+active_bet = None
 TOKEN = os.getenv("BOT_TOKEN")
 
 bot = telebot.TeleBot(TOKEN)
@@ -227,4 +227,108 @@ def secret_money(message):
         message,
         "💰 50000 سکه به حسابت اضافه شد!"
     )
+@bot.message_handler(commands=["betuser"])
+def betuser(message):
+
+    global active_bet
+
+    if active_bet:
+        bot.reply_to(message, "❌ یک شرط در حال انتظار است")
+        return
+
+    try:
+        amount = int(message.text.split()[1])
+    except:
+        bot.reply_to(message, "مثال:\n/betuser 500")
+        return
+
+    user = get_user(message.from_user)
+
+    if user[2] < amount:
+        bot.reply_to(message, "❌ موجودی کافی نیست")
+        return
+
+    active_bet = {
+        "creator": message.from_user.id,
+        "creator_name": message.from_user.first_name,
+        "amount": amount
+    }
+
+    bot.send_message(
+        message.chat.id,
+        f"🎲 {message.from_user.first_name} یک شرط {amount} سکه‌ای ساخت!\n\n/accept"
+    )
+
+
+@bot.message_handler(commands=["accept"])
+def accept(message):
+
+    global active_bet
+
+    if not active_bet:
+        return
+
+    if message.from_user.id == active_bet["creator"]:
+        return
+
+    amount = active_bet["amount"]
+
+    cursor.execute(
+        "SELECT balance FROM users WHERE user_id=?",
+        (message.from_user.id,)
+    )
+
+    row = cursor.fetchone()
+
+    if not row or row[0] < amount:
+        bot.reply_to(message, "❌ موجودی کافی نداری")
+        return
+
+    roll1 = random.randint(1, 6)
+    roll2 = random.randint(1, 6)
+
+    if roll1 > roll2:
+
+        winner = active_bet["creator"]
+        winner_name = active_bet["creator_name"]
+
+    elif roll2 > roll1:
+
+        winner = message.from_user.id
+        winner_name = message.from_user.first_name
+
+    else:
+
+        bot.send_message(
+            message.chat.id,
+            f"🤝 مساوی شد!\n🎲 {roll1} - {roll2}"
+        )
+
+        active_bet = None
+        return
+
+    loser = message.from_user.id if winner == active_bet["creator"] else active_bet["creator"]
+
+    cursor.execute(
+        "UPDATE users SET balance=balance-? WHERE user_id=?",
+        (amount, loser)
+    )
+
+    cursor.execute(
+        "UPDATE users SET balance=balance+? WHERE user_id=?",
+        (amount, winner)
+    )
+
+    db.commit()
+
+    bot.send_message(
+        message.chat.id,
+        f"⚔️ نتیجه شرط\n\n"
+        f"{active_bet['creator_name']} 🎲 {roll1}\n"
+        f"{message.from_user.first_name} 🎲 {roll2}\n\n"
+        f"🏆 برنده: {winner_name}\n"
+        f"💰 +{amount} سکه"
+    )
+
+    active_bet = None
 bot.infinity_polling(skip_pending=True)
