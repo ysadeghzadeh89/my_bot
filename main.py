@@ -346,7 +346,7 @@ def start(message):
         )
         conn.commit()
 
-   bot.send_message(message.chat.id, "خوش اومدی 👋")
+    bot.send_message(message.chat.id, "خوش اومدی 👋")
 @bot.message_handler(commands=["balances"])
 def balances(message):
 
