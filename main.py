@@ -362,6 +362,7 @@ def pay(message):
         return
 
     sender_id = message.from_user.id
+    get_user(message.reply_to_message.from_user)
     receiver_id = message.reply_to_message.from_user.id
 
     if sender_id == receiver_id:
