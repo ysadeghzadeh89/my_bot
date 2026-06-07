@@ -50,7 +50,7 @@ def start(message):
         "/bet 100\n"
         "/buy\n"
         "/luck\n"
-        "/top"
+        "/top\n"
         "/balances\n"
     )
 
