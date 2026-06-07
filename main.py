@@ -364,7 +364,7 @@ def pay(message):
     sender_id = message.from_user.id
     get_user(message.from_user)
 get_user(message.reply_to_message.from_user)
-    receiver_id = message.reply_to_message.from_user.id
+receiver_id = message.reply_to_message.from_user.id
 
     if sender_id == receiver_id:
         bot.reply_to(message, "نمی‌تونی به خودت پول بدی.")
