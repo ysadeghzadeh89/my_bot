@@ -362,10 +362,11 @@ def pay(message):
         return
 
     sender_id = message.from_user.id
+    receiver_id = message.reply_to_message.from_user.id
+
     get_user(message.from_user)
-get_user(message.reply_to_message.from_user)
-receiver_id = message.reply_to_message.from_user.id
- 
+    get_user(message.reply_to_message.from_user)
+
     if sender_id == receiver_id:
         bot.reply_to(message, "نمی‌تونی به خودت پول بدی.")
         return
@@ -377,8 +378,16 @@ receiver_id = message.reply_to_message.from_user.id
         bot.reply_to(message, "موجودی کافی نداری.")
         return
 
-    cursor.execute("UPDATE users SET balance = balance - ? WHERE user_id=?", (amount, sender_id))
-    cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id=?", (amount, receiver_id))
+    cursor.execute(
+        "UPDATE users SET balance = balance - ? WHERE user_id=?",
+        (amount, sender_id)
+    )
+
+    cursor.execute(
+        "UPDATE users SET balance = balance + ? WHERE user_id=?",
+        (amount, receiver_id)
+    )
+
     db.commit()
 
     bot.reply_to(message, f"✅ {amount:,} سکه منتقل شد.")
