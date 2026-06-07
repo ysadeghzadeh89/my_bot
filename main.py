@@ -364,4 +364,35 @@ def balances(message):
         text += f"{i}. {name}\n💰 {balance:,} | 🍀 {luck}%\n\n"
 
     bot.send_message(message.chat.id, text)
+    @bot.message_handler(commands=["pay"])
+def pay(message):
+    if not message.reply_to_message:
+        bot.reply_to(message, "روی پیام فرد مورد نظر ریپلای کن.")
+        return
+
+    try:
+        amount = int(message.text.split()[1])
+    except:
+        bot.reply_to(message, "مبلغ را درست وارد کن.")
+        return
+
+    sender_id = message.from_user.id
+    receiver_id = message.reply_to_message.from_user.id
+
+    if sender_id == receiver_id:
+        bot.reply_to(message, "نمی‌تونی به خودت پول بدی.")
+        return
+
+    cursor.execute("SELECT balance FROM users WHERE id=?", (sender_id,))
+    sender = cursor.fetchone()
+
+    if not sender or sender[0] < amount:
+        bot.reply_to(message, "موجودی کافی نداری.")
+        return
+
+    cursor.execute("UPDATE users SET balance = balance - ? WHERE id=?", (amount, sender_id))
+    cursor.execute("UPDATE users SET balance = balance + ? WHERE id=?", (amount, receiver_id))
+    conn.commit()
+
+    bot.reply_to(message, f"✅ {amount:,} سکه منتقل شد.")
 bot.infinity_polling(skip_pending=True)
