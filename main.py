@@ -331,14 +331,31 @@ def accept(message):
     )
 
     active_bet = None
+@bot.message_handler(commands=["start"])
+def start(message):
+    user_id = message.from_user.id
+    name = message.from_user.first_name
+
+    cursor.execute("SELECT * FROM users WHERE id=?", (user_id,))
+    user = cursor.fetchone()
+
+    if user is None:
+        cursor.execute(
+            "INSERT INTO users (id, name, balance, luck) VALUES (?, ?, ?, ?)",
+            (user_id, name, 1000, 10)
+        )
+        conn.commit()
+
+   bot.send_message(message.chat.id, "خوش اومدی 👋")
 @bot.message_handler(commands=["balances"])
 def balances(message):
 
-    cursor.execute(
-        "SELECT name,balance,luck FROM users ORDER BY balance DESC"
-    )
-
+    cursor.execute("SELECT name, balance, luck FROM users ORDER BY balance DESC")
     users = cursor.fetchall()
+
+    if not users:
+        bot.send_message(message.chat.id, "هیچ بازیکنی هنوز ثبت نشده ❌")
+        return
 
     text = "🏦 وضعیت بازیکنان:\n\n"
 
@@ -346,5 +363,4 @@ def balances(message):
         text += f"{i}. {name}\n💰 {balance:,} | 🍀 {luck}%\n\n"
 
     bot.send_message(message.chat.id, text)
-
 bot.infinity_polling(skip_pending=True)
