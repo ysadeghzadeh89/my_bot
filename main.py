@@ -331,4 +331,19 @@ def accept(message):
     )
 
     active_bet = None
+@bot.message_handler(commands=["balances"])
+def balances(message):
+
+    cursor.execute(
+        "SELECT name,balance,luck FROM users ORDER BY balance DESC"
+    )
+
+    users = cursor.fetchall()
+
+    text = "🏦 وضعیت بازیکنان:\n\n"
+
+    for i, (name, balance, luck) in enumerate(users, 1):
+        text += f"{i}. {name}\n💰 {balance:,} | 🍀 {luck}%\n\n"
+
+    bot.send_message(message.chat.id, text)
 bot.infinity_polling(skip_pending=True)
